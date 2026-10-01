@@ -27,7 +27,15 @@ class OperationsBloc extends Bloc<OperationsEvent, OperationsState> {
   /// Lets RefreshIndicator remain visible until the active load finishes.
   Future<void> refresh() async {
     if (isClosed) return;
-    final completed = stream.firstWhere((state) => !state.isLoading);
+    var hasStarted = state.isLoading;
+    // Ignore queued filter updates before loading; finish safely on disposal.
+    final completed = stream
+        .where((state) {
+          hasStarted = hasStarted || state.isLoading;
+          return hasStarted && !state.isLoading;
+        })
+        .take(1)
+        .drain<void>();
     if (!state.isLoading) add(const OperationsLoadRequested());
     await completed;
   }

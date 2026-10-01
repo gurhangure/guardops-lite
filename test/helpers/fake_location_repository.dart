@@ -8,6 +8,8 @@ class FakeLocationRepository implements LocationRepository {
   Object? error;
   Future<List<LocationModel>> Function()? loadCountries;
   int countryCalls = 0;
+  int continentCalls = 0;
+  Future<List<ContinentModel>> Function()? loadContinents;
   LocationModel? detail;
   Object? detailError;
   Future<LocationModel?> Function(String)? loadDetail;
@@ -22,8 +24,9 @@ class FakeLocationRepository implements LocationRepository {
 
   @override
   Future<List<ContinentModel>> fetchContinents() async {
+    continentCalls++;
     if (error != null) throw error!;
-    return continents;
+    return loadContinents == null ? continents : await loadContinents!();
   }
 
   @override

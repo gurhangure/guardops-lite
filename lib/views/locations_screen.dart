@@ -23,6 +23,8 @@ class LocationsScreen extends StatelessWidget {
               onRefresh: bloc.refresh,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
@@ -46,6 +48,7 @@ class LocationsScreen extends StatelessWidget {
                           key: ValueKey(state.continentCode),
                           initialValue: state.continentCode,
                           isExpanded: true,
+                          itemHeight: null,
                           decoration: const InputDecoration(
                             labelText: 'Continent',
                           ),
@@ -113,7 +116,10 @@ class LocationsScreen extends StatelessWidget {
                       final country = locations[index];
                       return ListTile(
                         key: ValueKey(country.code),
-                        onTap: () => onLocationSelected(country.code),
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                          onLocationSelected(country.code);
+                        },
                         leading: ExcludeSemantics(
                           child: Text(
                             country.emoji,
@@ -121,8 +127,10 @@ class LocationsScreen extends StatelessWidget {
                           ),
                         ),
                         title: Text(country.name),
-                        subtitle: Text(country.continent.name),
-                        trailing: Text(country.code),
+                        subtitle: Text(
+                          '${country.continent.name} • ${country.code}',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
                       );
                     },
                   ),

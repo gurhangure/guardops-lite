@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:guardops_lite/models/location_model.dart';
+import 'package:guardops_lite/models/continent_model.dart';
 import 'package:guardops_lite/repositories/location_repository.dart';
 import 'package:guardops_lite/viewmodels/operations_bloc.dart';
 import 'package:guardops_lite/viewmodels/operations_event.dart';
@@ -105,4 +106,27 @@ void main() {
     expect(find.byType(RefreshIndicator), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets(
+    'continent dropdown supports wrapped labels at large text sizes',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1;
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      repository.continents = [
+        const ContinentModel(code: 'NA', name: 'North America'),
+      ];
+      await show(tester);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byType(DropdownButtonFormField<String>));
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('North America').last);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
