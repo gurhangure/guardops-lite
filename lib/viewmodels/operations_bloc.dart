@@ -3,11 +3,15 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../repositories/location_repository.dart';
+import '../repositories/simulated_operations_repository.dart';
 import 'operations_event.dart';
 import 'operations_state.dart';
 
 class OperationsBloc extends Bloc<OperationsEvent, OperationsState> {
-  OperationsBloc(this._repository) : super(OperationsState()) {
+  OperationsBloc(
+    this._repository, {
+    this.simulatedOperationsRepository = const SimulatedOperationsRepository(),
+  }) : super(OperationsState()) {
     on<OperationsLoadRequested>(_load);
     on<OperationsSearchChanged>((event, emit) {
       emit(state.copyWith(query: event.query));
@@ -18,6 +22,7 @@ class OperationsBloc extends Bloc<OperationsEvent, OperationsState> {
   }
 
   final LocationRepository _repository;
+  final SimulatedOperationsRepository simulatedOperationsRepository;
 
   /// Lets RefreshIndicator remain visible until the active load finishes.
   Future<void> refresh() async {
@@ -46,6 +51,9 @@ class OperationsBloc extends Bloc<OperationsEvent, OperationsState> {
       emit(
         state.copyWith(
           countries: sortedCountries,
+          operationalStats: simulatedOperationsRepository.summarize(
+            sortedCountries,
+          ),
           continents: sortedContinents,
           isLoading: false,
           hasLoaded: true,

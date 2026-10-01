@@ -1,5 +1,6 @@
 import '../models/continent_model.dart';
 import '../models/location_model.dart';
+import '../models/operational_stats.dart';
 
 class OperationsState {
   OperationsState({
@@ -10,6 +11,7 @@ class OperationsState {
     this.query = '',
     this.continentCode = '',
     this.error,
+    this.operationalStats = const OperationalStats(),
   }) : countries = List.unmodifiable(countries),
        continents = List.unmodifiable(continents);
 
@@ -20,6 +22,11 @@ class OperationsState {
   final String query;
   final String continentCode;
   final String? error;
+  final OperationalStats operationalStats;
+  int get countryCount => countries.length;
+  int get continentCount => continents.length;
+  List<LocationModel> get locationPreview =>
+      List.unmodifiable(countries.take(3));
 
   List<LocationModel> get visibleCountries {
     final search = query.trim().toLowerCase();
@@ -41,6 +48,7 @@ class OperationsState {
     String? continentCode,
     String? error,
     bool clearError = false,
+    OperationalStats? operationalStats,
   }) => OperationsState(
     countries: countries ?? this.countries,
     continents: continents ?? this.continents,
@@ -49,5 +57,6 @@ class OperationsState {
     query: query ?? this.query,
     continentCode: continentCode ?? this.continentCode,
     error: clearError ? null : error ?? this.error,
+    operationalStats: operationalStats ?? this.operationalStats,
   );
 }

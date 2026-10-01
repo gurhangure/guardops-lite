@@ -12,14 +12,14 @@ AppDependencies testDependencies() => AppDependencies(
 );
 
 void main() {
-  testWidgets('App shell shows its identity and simulation disclaimer', (
+  testWidgets('Dashboard shows its identity and simulation disclaimer', (
     tester,
   ) async {
     final dependencies = testDependencies();
     await tester.pumpWidget(GuardOpsApp(dependencies: dependencies));
 
     expect(find.text('GuardOps Lite'), findsOneWidget);
-    expect(find.text('Welcome to GuardOps Lite'), findsOneWidget);
+    expect(find.text('Operations overview'), findsOneWidget);
     expect(
       find.text('Operational and device data in this demo are simulated.'),
       findsOneWidget,
@@ -29,7 +29,7 @@ void main() {
     expect(theme.colorScheme, dependencies.theme.colorScheme);
   });
 
-  testWidgets('App shell fits a small screen with enlarged text', (
+  testWidgets('Dashboard fits a small screen with enlarged text', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(320, 568);
