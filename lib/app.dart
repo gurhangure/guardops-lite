@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'core/di/app_dependencies.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'core/di/app_dependencies.dart';
+import 'repositories/location_repository.dart';
+import 'viewmodels/location_detail_bloc.dart';
+import 'viewmodels/location_detail_event.dart';
+import 'views/location_detail_screen.dart';
 
 import 'viewmodels/operations_bloc.dart';
 import 'viewmodels/operations_event.dart';
@@ -23,14 +27,16 @@ class GuardOpsApp extends StatelessWidget {
         create: (_) =>
             OperationsBloc(dependencies.locationRepository)
               ..add(const OperationsLoadRequested()),
-        child: const _AppShell(),
+        child: _AppShell(repository: dependencies.locationRepository),
       ),
     );
   }
 }
 
 class _AppShell extends StatelessWidget {
-  const _AppShell();
+  const _AppShell({required this.repository});
+
+  final LocationRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +78,24 @@ class _AppShell extends StatelessWidget {
                         MaterialPageRoute<void>(
                           builder: (_) => BlocProvider.value(
                             value: bloc,
-                            child: const LocationsScreen(),
+                            child: LocationsScreen(
+                              onLocationSelected: (code) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => BlocProvider(
+                                      create: (_) =>
+                                          LocationDetailBloc(
+                                            repository,
+                                            countryCode: code,
+                                          )..add(
+                                            const LocationDetailLoadRequested(),
+                                          ),
+                                      child: const LocationDetailScreen(),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );

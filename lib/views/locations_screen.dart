@@ -6,7 +6,9 @@ import '../viewmodels/operations_event.dart';
 import '../viewmodels/operations_state.dart';
 
 class LocationsScreen extends StatelessWidget {
-  const LocationsScreen({super.key});
+  const LocationsScreen({required this.onLocationSelected, super.key});
+
+  final ValueChanged<String> onLocationSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +113,7 @@ class LocationsScreen extends StatelessWidget {
                       final country = locations[index];
                       return ListTile(
                         key: ValueKey(country.code),
+                        onTap: () => onLocationSelected(country.code),
                         leading: ExcludeSemantics(
                           child: Text(
                             country.emoji,

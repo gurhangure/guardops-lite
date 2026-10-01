@@ -8,6 +8,10 @@ class FakeLocationRepository implements LocationRepository {
   Object? error;
   Future<List<LocationModel>> Function()? loadCountries;
   int countryCalls = 0;
+  LocationModel? detail;
+  Object? detailError;
+  Future<LocationModel?> Function(String)? loadDetail;
+  final List<String> detailCodes = [];
 
   @override
   Future<List<LocationModel>> fetchCountries() async {
@@ -23,5 +27,9 @@ class FakeLocationRepository implements LocationRepository {
   }
 
   @override
-  Future<LocationModel?> fetchCountry(String code) async => null;
+  Future<LocationModel?> fetchCountry(String code) async {
+    detailCodes.add(code);
+    if (detailError != null) throw detailError!;
+    return loadDetail == null ? detail : await loadDetail!(code);
+  }
 }

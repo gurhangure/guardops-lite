@@ -25,7 +25,7 @@ void main() {
         home: BlocProvider(
           create: (_) =>
               OperationsBloc(repository)..add(const OperationsLoadRequested()),
-          child: const LocationsScreen(),
+          child: LocationsScreen(onLocationSelected: (_) {}),
         ),
       ),
     );
