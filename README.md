@@ -7,7 +7,7 @@ A Flutter portfolio application demonstrating an operations dashboard, live geog
 
 **Latest Version: v1.1.0 — Continent Overview**
 
-[Download Android APK (v1.1.0)](https://github.com/gurhangure/guardops-lite/releases/download/v1.1.0/GuardOps-Lite-v1.1.0.apk)
+[Download Android APK (v1.1.0)](https://github.com/gurhangure/guardops-lite/releases/download/v1.1.0/app-release.apk)
 
 The APK can be installed directly on a compatible Android device without setting up a Flutter development environment.
 
