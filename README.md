@@ -1,112 +1,236 @@
+
 # GuardOps Lite
 
 A Flutter portfolio application demonstrating an operations dashboard, live geographic data, and simulated device statistics using MVVM, BLoC, GraphQL, and constructor-based dependency injection.
 
+## Download
+
+**Latest Version: v1.1.0 — Continent Overview**
+
+[Download Android APK (v1.1.0)](https://github.com/gurhangure/guardops-lite/releases/download/v1.1.0/GuardOps-Lite-v1.1.0.apk)
+
+The APK can be installed directly on a compatible Android device without setting up a Flutter development environment.
+
+> **Note:** This is a portfolio/demo application. The APK uses demo signing and is not intended for production or store distribution.
+
 ## Features
 
-- Dashboard with geographic totals, a live continent distribution overview, and simulated device status counts.
-- Country search, continent filtering, pull-to-refresh, and filters preserved after detail navigation.
-- Country details fetched with a parameterized query: capital, currency, code, and continent.
-- Loading, empty, error, and retry states; refresh failures retain previously loaded data.
+- Operations dashboard with API-derived geographic totals and simulated device status counts.
+- Live Continent Overview displaying country distribution by continent.
+- Dynamic horizontal distribution bars calculated from the complete Countries API dataset.
+- Country search, continent filtering, and pull-to-refresh.
+- Search and filter selections preserved after detail navigation.
+- Country details fetched using a parameterized GraphQL query, including capital, currency, code, and continent.
+- Loading, empty, error, and retry states.
+- Previously loaded data retained when refresh fails.
 - Material 3 layouts with automated small-screen, landscape, and enlarged-text coverage.
 
 ## Screenshots
 
-Captured from the release APK on a Pixel 10 Pro Android 17 emulator with live Countries API data. Counts reflect the capture date. The Dashboard screenshot reflects the previous layout; replace it with a new capture after installing this update.
+Captured on a Pixel 10 Pro Android emulator using live Countries API data. Geographic counts reflect the capture date.
 
-| Dashboard | Locations | Country details |
+| Dashboard | Locations | Country Details |
 | --- | --- | --- |
-| <img src="docs/screenshots/dashboard.png" alt="Dashboard with geographic totals and simulation disclaimer" width="250"> | <img src="docs/screenshots/locations.png" alt="Country list with search and continent filter" width="250"> | <img src="docs/screenshots/location-detail.png" alt="Germany details from the Countries API" width="250"> |
+| <img src="docs/screenshots/dashboard.png" alt="Operations dashboard with continent overview and simulated statistics" width="250"> | <img src="docs/screenshots/locations.png" alt="Country list with search and continent filter" width="250"> | <img src="docs/screenshots/location-detail.png" alt="Germany details from the Countries API" width="250"> |
 
-## Technology and architecture
+## Technology and Architecture
 
-Flutter 3.47.2 stable / Dart 3.13.2, `flutter_bloc`, `graphql_flutter`, Material 3, `flutter_test`, `bloc_test`, and GitHub Actions. Dependency versions are recorded in `pubspec.lock`.
+**Technology Stack**
 
-MVVM is the primary architecture. BLoCs fulfill ViewModel responsibilities; there is no additional ChangeNotifier or domain/use-case layer.
+- Flutter 3.47.2 / Dart 3.13.2
+- MVVM Architecture
+- BLoC State Management (`flutter_bloc`)
+- GraphQL (`graphql_flutter`)
+- Repository Pattern
+- Constructor-based Dependency Injection
+- Material 3
+- Unit and Widget Testing
+- GitHub Actions CI/CD
+
+Dependency versions are recorded in `pubspec.lock`.
+
+### Architecture Overview
+
+MVVM is the primary architectural pattern. BLoCs fulfill ViewModel responsibilities without introducing additional ChangeNotifier-based ViewModels or unnecessary Domain/UseCase layers.
 
 | Responsibility | Implementation |
 | --- | --- |
-| Model and data access | Immutable models; `LocationRepository` abstracts geographic data; `GraphQLLocationRepository` maps API data and failures; `SimulatedOperationsRepository` computes repeatable local counts. |
-| ViewModel | `OperationsBloc` coordinates loading, search, filters, refresh, and dashboard state. `LocationDetailBloc` loads the selected country and handles retries. |
-| View | Screens render BLoC states and forward interactions. Widgets do not make GraphQL calls. |
-| Composition | `AppDependencies` constructs the theme and repositories. Constructor injection supports network-free tests. |
+| Model & Data Access | Immutable models; `LocationRepository` abstracts geographic data; `GraphQLLocationRepository` maps API responses and failures; `SimulatedOperationsRepository` generates repeatable local statistics. |
+| ViewModel | `OperationsBloc` coordinates data loading, search, filtering, refresh, continent aggregation, and dashboard state. `LocationDetailBloc` manages individual country details and retry behavior. |
+| View | Flutter screens render BLoC states and forward user interactions. Widgets do not perform direct GraphQL requests. |
+| Dependency Injection | `AppDependencies` provides constructor-based dependency wiring and supports network-free automated tests. |
+
+### Project Structure
 
 ```text
 lib/
   core/
-    di/            # Composition root
-    graphql/       # Client and query documents
+    di/            # Dependency injection
+    graphql/       # GraphQL client and queries
     theme/         # Material 3 theme
-  models/          # Geographic models and operational totals
+  models/          # Geographic models and operational statistics
   repositories/    # GraphQL access and local simulation
   viewmodels/      # BLoCs, events, and presentation states
   views/           # Dashboard, locations, and detail screens
-  app.dart         # App and route composition
-  main.dart        # Entry point
+  app.dart         # Application and route composition
+  main.dart        # Application entry point
+
 test/
-  helpers/         # Fake repository and fixtures
+  helpers/         # Fake repositories and test fixtures
   repositories/    # Data mapping and failure tests
-  viewmodels/      # State transitions and refresh regressions
-  views/           # Screen states and responsive navigation
-.github/workflows/flutter.yml
-docs/              # Public documentation and screenshots
+  viewmodels/      # State transitions and regression tests
+  views/           # Widget and responsive navigation tests
+
+.github/
+  workflows/
+    flutter.yml    # CI/CD pipeline
+
+docs/
+  screenshots/     # Public application screenshots
 ```
 
-## GraphQL integration
+## GraphQL Integration
 
-The public [Countries API](https://countries.trevorblades.com/) supplies countries and continents without an API key. List queries run concurrently. Details use `Country($code: ID!)` with a normalized two-letter code passed as a variable.
+The application uses the public [Countries GraphQL API](https://countries.trevorblades.com/) to retrieve geographic information without requiring an API key.
 
-Queries and client configuration live in `lib/core/graphql/`. The repository maps typed models and distinguishes network, GraphQL, and invalid-response failures. Explicit loads use `FetchPolicy.noCache` and a 15-second request timeout. List data remains visible after refresh failure, but there is no persistent offline cache. Search and filtering operate locally on the loaded list.
+- Countries and continents are loaded concurrently.
+- Country details are retrieved using the parameterized `Country($code: ID!)` query.
+- Responses are mapped into strongly typed, immutable Dart models.
+- Network, GraphQL, and malformed-response failures are handled separately.
+- Explicit loads use `FetchPolicy.noCache` and a 15-second request timeout.
+- Search and continent filtering operate locally on the loaded dataset.
+- Dashboard continent statistics are calculated dynamically from the complete country list.
+- Previously loaded data remains available if a refresh fails.
 
-## Setup and running
+The application does not implement persistent offline caching.
 
-1. Install Flutter **3.47.2 stable** (Dart 3.13.2) and add Flutter to PATH.
-2. Install Android Studio/SDK and a compatible JDK (CI uses Java 17). Start an emulator or connect a device with USB debugging.
-3. From the project directory:
+## Setup and Running
+
+### Requirements
+
+- Flutter 3.47.2 stable (Dart 3.13.2)
+- Android Studio / Android SDK
+- Compatible JDK (CI uses Java 17)
+- Android emulator or physical Android device
+- Internet connection for geographic data
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/gurhangure/guardops-lite.git
+cd guardops-lite
+```
+
+Verify your Flutter environment:
 
 ```bash
 flutter doctor
 flutter doctor --android-licenses
+```
+
+Install dependencies using the committed lockfile:
+
+```bash
 flutter pub get --enforce-lockfile
+```
+
+Check available devices and run:
+
+```bash
 flutter devices
 flutter run -d <device-id>
 ```
 
-Internet access is required for geographic data. Android release builds include the INTERNET permission. The retained target platforms are Android and iOS. Android is the verified delivery target; iOS has not received equivalent release validation. Linux, macOS, Windows, and web runners are intentionally excluded.
+The retained target platforms are Android and iOS. Android is the verified delivery target; iOS has not received equivalent release validation.
 
-## Verification
+Linux, macOS, Windows, and web runners are intentionally excluded.
+
+## Verification and Testing
+
+Run the complete local verification suite:
 
 ```bash
 dart format lib test && flutter analyze && flutter test
 ```
 
-CI checks formatting without modifying files:
+GitHub Actions additionally verifies formatting without modifying source files:
 
 ```bash
 dart format --output=none --set-exit-if-changed lib test
 ```
 
-The 61 automated tests use injected fakes or mocked GraphQL links and do not call the live API. They cover repository mapping/errors, BLoC transitions, overlapping refresh callers, disposal during loading, filters, screen states, and navigation at three viewport sizes with text scales 1.0 and 2.0.
+### Automated Test Coverage
+
+**61 automated tests passing.**
+
+Tests cover:
+
+- GraphQL response mapping and typed failures.
+- Immutable models and nullable fields.
+- BLoC state transitions.
+- Search and combined continent filtering.
+- Dashboard statistics and continent aggregation.
+- Concurrent loading and overlapping refresh requests.
+- Retained data following refresh failures.
+- Safe disposal during asynchronous operations.
+- Country-detail navigation and retry behavior.
+- Loading, empty, and error UI states.
+- Responsive navigation across multiple viewport sizes and enlarged text scales.
+
+Automated tests use injected fake repositories or mocked GraphQL transport and do not depend on live network requests.
 
 ## Release APK
 
+Generate an Android release APK locally:
+
 ```bash
 flutter build apk --release
-flutter install --release -d <android-device-id>
 ```
 
-Output: `build/app/outputs/flutter-apk/app-release.apk`.
+Output:
 
-The release build uses Android's local **debug signing key** for portfolio/demo installation. It is not configured for store distribution. No signing credentials are stored in the repository. Build output, local SDK paths, caches, and signing material are ignored by Git.
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+Alternatively, download the published APK directly:
+
+[GuardOps Lite v1.1.0 — GitHub Release](https://github.com/gurhangure/guardops-lite/releases/tag/v1.1.0)
+
+The demo APK uses an Android debug signing certificate. Production signing and store deployment are not configured.
+
+No signing credentials are stored in the repository.
 
 ## CI/CD
 
-[Flutter CI](.github/workflows/flutter.yml) runs on every push and pull request. It checks out source, sets up Java and pinned Flutter, installs locked dependencies, checks formatting, runs analysis and tests, builds a release APK, and uploads only that APK with a 14-day retention period. Download it from a successful run's **Artifacts** section.
+The project includes an automated [Flutter CI workflow](.github/workflows/flutter.yml) powered by GitHub Actions.
 
-The workflow uses read-only repository permissions and cancels superseded runs on the same ref. It does not publish GitHub releases or deploy to app stores. Workflow syntax and local build/check commands were validated; a hosted GitHub Actions run remains pending an approved push to a configured remote.
+The workflow runs on pushes and pull requests and performs the following operations:
 
-Configuration follows the official [Flutter action](https://github.com/subosito/flutter-action), [Java setup](https://github.com/actions/setup-java), [checkout](https://github.com/actions/checkout), and [artifact upload](https://github.com/actions/upload-artifact) documentation.
+1. Checkout repository.
+2. Configure Java 17.
+3. Set up Flutter 3.47.2.
+4. Install dependencies using the enforced lockfile.
+5. Verify Dart formatting.
+6. Run static analysis.
+7. Execute automated tests.
+8. Build the Android release APK.
+9. Upload the generated APK as a workflow artifact.
 
-## Simulation disclaimer
+The workflow has been successfully verified on GitHub Actions, including all 61 automated tests, release APK generation, and artifact upload.
 
-**All operational/device statistics are simulated local demo data.** Country codes deterministically generate device counts. The application does not connect to security systems, sensors, enterprise infrastructure, or real devices. Geographic information comes from the Countries API. A listed country is not evidence of an operational deployment.
+Workflow artifacts are retained for 14 days. The published GitHub Release provides a persistent download for v1.1.0.
+
+The workflow uses read-only repository permissions and cancels superseded runs on the same ref. It does not automatically deploy to app stores or publish GitHub Releases.
+
+## Simulation Disclaimer
+
+**All operational/device statistics are simulated local demo data.**
+
+Country codes are used to deterministically generate device counts for demonstration purposes.
+
+The application does not connect to actual security systems, sensors, enterprise infrastructure, or physical operational devices.
+
+Geographic information is retrieved from the public Countries API. A listed country does not indicate an actual operational deployment.
