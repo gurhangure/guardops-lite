@@ -47,8 +47,9 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# Local Codex instructions
+# Local AI instructions and development artifacts
 /AGENTS.md
+/internal/
 
 # Local secrets and signing material
 .env

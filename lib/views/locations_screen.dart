@@ -95,7 +95,9 @@ class LocationsScreen extends StatelessWidget {
                           ),
                         ],
                         if (state.hasLoaded)
-                          Text('${locations.length} countries'),
+                          Text(
+                            '${locations.length} ${locations.length == 1 ? 'country' : 'countries'}',
+                          ),
                       ],
                     ),
                   ),
