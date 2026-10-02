@@ -45,12 +45,12 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.ensureVisible(find.text('Locations summary'));
+        await tester.ensureVisible(find.text('Continent overview'));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        await tester.ensureVisible(find.text('View locations'));
+        await tester.ensureVisible(find.text('Explore all locations'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('View locations'));
+        await tester.tap(find.text('Explore all locations'));
         await tester.pumpAndSettle();
         await tester.enterText(find.byType(TextField), 'United');
         await tester.pumpAndSettle();

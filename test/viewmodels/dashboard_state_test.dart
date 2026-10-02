@@ -23,7 +23,11 @@ void main() {
     await bloc.stream.first;
     expect(bloc.state.visibleCountries, hasLength(1));
     expect(bloc.state.countryCount, 2);
-    expect(bloc.state.locationPreview, [germany, japan]);
+    expect(bloc.state.continentCountryCounts.map((item) => item.count), [1, 1]);
+    expect(bloc.state.continentCountryCounts.map((item) => item.name), [
+      'Asia',
+      'Europe',
+    ]);
     expect(bloc.state.operationalStats.total, total);
     repository.error = const LocationRepositoryException(
       LocationFailure.network,
@@ -35,5 +39,6 @@ void main() {
     await bloc.refresh();
     expect(bloc.state.operationalStats.total, 0);
     expect(bloc.state.countryCount, 0);
+    expect(bloc.state.continentCountryCounts.map((item) => item.count), [0, 0]);
   });
 }

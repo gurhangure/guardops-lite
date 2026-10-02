@@ -31,15 +31,6 @@ class DashboardScreen extends StatelessWidget {
                     'Operational and device data in this demo are simulated.',
                   ),
                   const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FilledButton.icon(
-                      onPressed: onViewLocations,
-                      icon: const Icon(Icons.public),
-                      label: const Text('View locations'),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
                   if (state.isLoading)
                     const LinearProgressIndicator(
                       semanticsLabel: 'Loading overview',
@@ -122,34 +113,49 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Locations summary',
+                      'Continent overview',
                       style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Countries by continent, from the live Countries API.',
                     ),
                     const SizedBox(height: 12),
                     if (state.countries.isEmpty)
                       const Text(
                         'No countries available. Open Locations to refresh.',
                       )
-                    else ...[
-                      const Text(
-                        'First locations alphabetically. View locations to explore all countries.',
-                      ),
-                      const SizedBox(height: 8),
+                    else
                       Card(
-                        child: Column(
-                          children: [
-                            for (final country in state.locationPreview)
-                              ListTile(
-                                leading: ExcludeSemantics(
-                                  child: Text(country.emoji),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              for (final summary
+                                  in state.continentCountryCounts)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  child: _ContinentRow(
+                                    name: summary.name,
+                                    count: summary.count,
+                                    total: state.countryCount,
+                                  ),
                                 ),
-                                title: Text(country.name),
-                                subtitle: Text(country.continent.name),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.center,
+                      child: FilledButton.icon(
+                        onPressed: onViewLocations,
+                        icon: const Icon(Icons.public),
+                        label: const Text('Explore all locations'),
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -207,4 +213,41 @@ class _MetricCard extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// A responsive data row; distribution uses the full API country count.
+class _ContinentRow extends StatelessWidget {
+  const _ContinentRow({
+    required this.name,
+    required this.count,
+    required this.total,
+  });
+
+  final String name;
+  final int count;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = total == 0 ? 0.0 : count / total;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text(name)),
+            const SizedBox(width: 12),
+            Text('$count', style: Theme.of(context).textTheme.labelLarge),
+          ],
+        ),
+        const SizedBox(height: 6),
+        LinearProgressIndicator(
+          value: ratio.clamp(0.0, 1.0),
+          minHeight: 8,
+          borderRadius: BorderRadius.circular(8),
+          semanticsLabel: '$name: $count of $total countries',
+        ),
+      ],
+    );
+  }
 }

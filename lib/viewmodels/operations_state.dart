@@ -2,6 +2,19 @@ import '../models/continent_model.dart';
 import '../models/location_model.dart';
 import '../models/operational_stats.dart';
 
+/// API-derived number of countries within a continent.
+class ContinentCountryCount {
+  const ContinentCountryCount({
+    required this.code,
+    required this.name,
+    required this.count,
+  });
+
+  final String code;
+  final String name;
+  final int count;
+}
+
 class OperationsState {
   OperationsState({
     List<LocationModel> countries = const [],
@@ -25,8 +38,27 @@ class OperationsState {
   final OperationalStats operationalStats;
   int get countryCount => countries.length;
   int get continentCount => continents.length;
-  List<LocationModel> get locationPreview =>
-      List.unmodifiable(countries.take(3));
+
+  /// Uses the complete API dataset, independent of the Locations search/filter.
+  /// Includes continents with zero countries when returned by the API.
+  List<ContinentCountryCount> get continentCountryCounts {
+    final totals = <String, int>{};
+    for (final country in countries) {
+      totals.update(
+        country.continent.code,
+        (count) => count + 1,
+        ifAbsent: () => 1,
+      );
+    }
+    return List.unmodifiable([
+      for (final continent in continents)
+        ContinentCountryCount(
+          code: continent.code,
+          name: continent.name,
+          count: totals[continent.code] ?? 0,
+        ),
+    ]);
+  }
 
   List<LocationModel> get visibleCountries {
     final search = query.trim().toLowerCase();

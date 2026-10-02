@@ -4,7 +4,7 @@ A Flutter portfolio application demonstrating an operations dashboard, live geog
 
 ## Features
 
-- Dashboard with geographic totals, a locations preview, and simulated device status counts.
+- Dashboard with geographic totals, a live continent distribution overview, and simulated device status counts.
 - Country search, continent filtering, pull-to-refresh, and filters preserved after detail navigation.
 - Country details fetched with a parameterized query: capital, currency, code, and continent.
 - Loading, empty, error, and retry states; refresh failures retain previously loaded data.
@@ -12,7 +12,7 @@ A Flutter portfolio application demonstrating an operations dashboard, live geog
 
 ## Screenshots
 
-Captured from the release APK on a Pixel 10 Pro Android 17 emulator with live Countries API data. Counts reflect the capture date. The dashboard continues below the screenshot.
+Captured from the release APK on a Pixel 10 Pro Android 17 emulator with live Countries API data. Counts reflect the capture date. The Dashboard screenshot reflects the previous layout; replace it with a new capture after installing this update.
 
 | Dashboard | Locations | Country details |
 | --- | --- | --- |

@@ -43,10 +43,13 @@ void main() {
       find.text('Local demo counts. No real infrastructure is connected.'),
       findsOneWidget,
     );
-    await tester.ensureVisible(find.text('Locations summary'));
+    await tester.ensureVisible(find.text('Continent overview'));
     await tester.pumpAndSettle();
-    expect(find.text('Germany'), findsOneWidget);
-    expect(find.text('Japan'), findsOneWidget);
+    expect(find.text('Europe'), findsOneWidget);
+    expect(find.text('Asia'), findsOneWidget);
+    expect(find.text('Explore all locations'), findsOneWidget);
+    expect(find.text('Germany'), findsNothing);
+    expect(find.text('Japan'), findsNothing);
   });
   testWidgets('failure offers retry and empty success shows zero devices', (
     tester,
@@ -79,12 +82,12 @@ void main() {
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       await show(tester);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Locations summary'));
+      await tester.ensureVisible(find.text('Continent overview'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      await tester.ensureVisible(find.text('View locations'));
+      await tester.ensureVisible(find.text('Explore all locations'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('View locations'));
+      await tester.tap(find.text('Explore all locations'));
       await tester.pumpAndSettle();
       expect(find.text('Locations'), findsOneWidget);
       expect(repository.countryCalls, 1);

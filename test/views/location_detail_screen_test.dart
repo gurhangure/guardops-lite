@@ -115,7 +115,10 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.text('View locations'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Explore all locations'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Explore all locations'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'ger');
       await tester.pumpAndSettle();
